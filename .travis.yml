@@ -1,0 +1,35 @@
+sudo: required
+language: generic
+services:
+  - docker
+
+before_install:
+  - docker build -t sparkymaster/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true sparkymaster/react-test npm run test
+
+after_success:
+  - docker build -t sparkymaster/multi-client ./client
+  - docker build -t sparkymaster/multi-nginx ./nginx
+  - docker build -t sparkymaster/multi-server ./server
+  - docker build -t sparkymaster/multi-worker ./worker
+  #log into docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # push images to dockerhub
+  - docker push sparkymaster/multi-client
+  - docker push sparkymaster/multi-nginx
+  - docker push sparkymaster/multi-server
+  - docker push sparkymaster/multi-worker
+
+#deploy:
+#  provider: elasticbeanstalk
+#  region: "us-east-2"
+#  app: "react-test"
+#  env: "DockerReact-env"
+#  bucket_name: "elasticbeanstalk-us-east-2-621359858833"
+#  bucket_path: "react-test"
+#  on:
+#    branch: 
+#  access_key_id: $AWS_ACCESS_KEY
+#  secret_access_key: $AWS_SECRET_KEY
