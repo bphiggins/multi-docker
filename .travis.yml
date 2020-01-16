@@ -22,14 +22,15 @@ after_success:
   - docker push sparkymaster/multi-server
   - docker push sparkymaster/multi-worker
 
-#deploy:
-#  provider: elasticbeanstalk
-#  region: "us-east-2"
-#  app: "react-test"
-#  env: "DockerReact-env"
-#  bucket_name: "elasticbeanstalk-us-east-2-621359858833"
-#  bucket_path: "react-test"
-#  on:
-#    branch: 
-#  access_key_id: $AWS_ACCESS_KEY
-#  secret_access_key: $AWS_SECRET_KEY
+deploy:
+  edge: true
+  provider: elasticbeanstalk
+  region: "us-east-2"
+  app: "multi-docker"
+  env: "MultiDocker-env"
+  bucket_name: "elasticbeanstalk-us-east-2-621359858833"
+  bucket_path: "docker-multi"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
