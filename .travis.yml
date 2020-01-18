@@ -1,36 +1,35 @@
 sudo: required
-language: generic
 services:
   - docker
 
 before_install:
-  - docker build -t sparkymaster/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t stephengrider/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true sparkymaster/react-test npm run test
+  - docker run stephengrider/react-test npm test -- --coverage
 
 after_success:
-  - docker build -t sparkymaster/multi-client ./client
-  - docker build -t sparkymaster/multi-nginx ./nginx
-  - docker build -t sparkymaster/multi-server ./server
-  - docker build -t sparkymaster/multi-worker ./worker
-  #log into docker cli
+  - docker build -t stephengrider/multi-client ./client
+  - docker build -t stephengrider/multi-nginx ./nginx
+  - docker build -t stephengrider/multi-server ./server
+  - docker build -t stephengrider/multi-worker ./worker
+  # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # push images to dockerhub
-  - docker push sparkymaster/multi-client
-  - docker push sparkymaster/multi-nginx
-  - docker push sparkymaster/multi-server
-  - docker push sparkymaster/multi-worker
+  # Take those images and push them to docker hub
+  - docker push stephengrider/multi-client
+  - docker push stephengrider/multi-nginx
+  - docker push stephengrider/multi-server
+  - docker push stephengrider/multi-worker
 
 deploy:
-  edge: true
   provider: elasticbeanstalk
-  region: "us-east-2"
-  app: "multi-docker"
-  env: "MultiDocker-env"
-  bucket_name: "elasticbeanstalk-us-east-2-621359858833"
-  bucket_path: "docker-multi"
+  region: us-west-1
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-us-west-1-306476627547
+  bucket_path: docker-multi
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $AWS_SECRET_KEY
+  secret_access_key:
+    secure: $AWS_SECRET_KEY
